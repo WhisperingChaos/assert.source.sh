@@ -47,7 +47,7 @@ assert_bool(){
 	local -r negate="$2"
 
 	if eval $negate $expression; then
-		echo "status='${FUNCNAME[1]} failed' source=${BASH_SOURCE[2]} test='${FUNCNAME[2]}' lineno='${BASH_LINENO[1]}'" >&2
+		echo "status='failed' func='${FUNCNAME[1]}' source='${BASH_SOURCE[2]}' test='${FUNCNAME[2]}' lineno=${BASH_LINENO[1]}" >&2
 		return 1
 	fi
 	return 0
