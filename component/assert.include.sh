@@ -9,19 +9,21 @@ assert__output_bool(){
 	local -r expectedFn="$1"
 	local -r negate="$2"
 
-	local input
-	local inputCnt=0
+	local generated
+	local generatedCnt=0
 	local expected
 	local expectedCnt=0
 	local fDesc
 	exec {fDesc}< <( $expectedFn ) 
-	while read -r input; do
-		((inputCnt++))
+	while read -r generated; do
+		((generatedCnt++))
 		if read -r -u $fDesc expected; then
 			((expectedCnt++))
 		fi
-		if eval $negate \[\[ \$input \=\~ \$expected \]\]; then 
-			eval exec $fDesc\<\&\- 
+		if eval $negate \[\[ \$generated \=\~ \$expected \]\]; then 
+			eval exec $fDesc\<\&\-
+			echo "generated: '$generated'">&2
+			echo "expected:  '$expected'" >&2	
 			return 1
 		fi
 	done
@@ -29,7 +31,8 @@ assert__output_bool(){
 		((expectedCnt++))
 	done
 	eval exec $fDesc\>\&\- 
-	if [ $inputCnt -ne $expectedCnt ]; then 
+	if [ $generatedCnt -ne $expectedCnt ]; then 
+		echo "generated lines $generatedCnt != $expectedCnt expected lines" >&2
 		return 1
 	fi
 	true
