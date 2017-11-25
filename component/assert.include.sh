@@ -7,7 +7,6 @@
 #	file - they should only be called by functions within it.
 
 assert_REGEX_COMPARE='<RegEx>'
-
 # assert_output functions accept only a single argument.  That argument, in most
 # cases should be the name of a bash function that writes to sysout.  
 assert_output_true(){
@@ -60,8 +59,16 @@ assert__output_bool(){
 		 fi
 		 if ! $asrtEval; then
 			eval exec $asrtFDesc\<\&\-
-			echo "generated: '$asrtGenerated'">&2
-			echo "expected:  '$asrtExpected'" >&2	
+			echo "msg='${FUNCNAME[1]} failed'" >&2
+			echo "  generated='$asrtGenerated'">&2
+			echo "  expected_='$asrtExpected'" >&2	
+			echo "  lineNo=${BASH_LINENO[1]}"  >&2
+			# indirectly called from failing test :: use [2] to identify it.
+			echo "  source='${BASH_SOURCE[2]}' func='${FUNCNAME[2]}'" >&2
+			# note when participating in a pipe, recording and halting
+			# don't affect the parent process
+			assert__raised_record
+			assert__halt_check
 			return 1
 		fi
 	done
@@ -70,7 +77,16 @@ assert__output_bool(){
 	done
 	eval exec $asrtFDesc\>\&\- 
 	if [ $asrtGeneratedCnt -ne $asrtExpectedCnt ]; then 
-		echo "generated lines $asrtGeneratedCnt != $asrtExpectedCnt expected lines" >&2
+		echo "msg='${FUNCNAME[1]} failed'" >&2
+		echo "  generatedCnt='$asrtGeneratedCnt'">&2
+		echo "  expected_Cnt='$asrtExpectedCnt'" >&2	
+		echo "  lineNo=${BASH_LINENO[1]}"  >&2
+		# indirectly called from failing test :: use [2] to identify it.
+		echo "  source='${BASH_SOURCE[2]}' func='${FUNCNAME[2]}'" >&2
+		# note when participating in a pipe, recording and halting
+		# don't affect the parent process
+		assert__raised_record
+		assert__halt_check
 		return 1
 	fi
 	true
@@ -78,11 +94,9 @@ assert__output_bool(){
 assert_true(){
 	assert__bool "$1" ' '
 }
-
 assert_false(){
 	assert__bool "$1" '!'
 }
-
 assert__bool(){
 	local -r asrtExpression="$1"
 	local -r asrtNegate="$2"
@@ -90,7 +104,34 @@ assert__bool(){
 	if eval $asrtNegate $asrtExpression; then
 		return
 	fi
-	# indirectly called from failing test :: use [2] to identify it.  
-	echo "status='${FUNCNAME[1]} failed' func='${FUNCNAME[2]}' lineno=${BASH_LINENO[1]} source='${BASH_SOURCE[2]}'" >&2
+	echo "msg='${FUNCNAME[1]} failed'" >&2
+	echo "  expression=$asrtNegate $asrtExpression" >&2
+	eval echo \' \ evalExpres=\'\"\$asrtNegate\ \"\"$asrtExpression\" >&2
+	echo "  lineNo=${BASH_LINENO[1]}" >&2
+	# indirectly called from failing test :: use [2] to identify it.
+	echo "  source='${BASH_SOURCE[2]}' func='${FUNCNAME[2]}'" >&2
+	assert__raised_record
+	assert__halt_check
+}
+# default implementation supporting asserts that immediately halt or continue
+assert_RAISED_SOMETIME_DURING_EXECUTION='false' 
+assert_halt(){
+	assert__halt_check(){
+		exit 1
+	}
+}
+assert_continue(){
+	assert__halt_check(){
+		return 1
+	}
+}
+assert__raised_record(){
+	assert_RAISED_SOMETIME_DURING_EXECUTION='true'
+}
+assert__halt_check(){
 	return 1
 }
+assert_raised_check(){
+	! $assert_RAISED_SOMETIME_DURING_EXECUTION
+}
+
