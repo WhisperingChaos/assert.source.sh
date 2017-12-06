@@ -23,7 +23,7 @@ assert__output_bool(){
 	local -r asrtExpectedFn="$1"
 	# execute expected function before defining many other
 	# local variables to ensure generation function binds,
-    # if it needs to, to variables declared outside the
+	# if it needs to, to variables declared outside the
 	# scope of this function. 
 	local asrtFDesc
 	exec {asrtFDesc}< <( $asrtExpectedFn ) 
@@ -50,7 +50,7 @@ assert__output_bool(){
 		#	1. Regex expressions, that appear in RHS of regex comparison,
 	   	#	must not be encapsulated in quotes because if they are quoted,
 		#	they are evaluated as just an ordnary string of characters.    
-	    #	2. The equality operator requires both its operands encapsulated
+		#	2. The equality operator requires both its operands encapsulated
 	   	#	by double quotes to prevent certain characters like '[' and ']'
 		#	from interferring with its evaluation.
 		#	3. Finally, the LHS operand of a regex operator must also be
@@ -107,11 +107,11 @@ assert__bool(){
 	# escape all quotes using either concatenation or '\'.
 	# Ex:
 	#	b='"'
-	#   asrtExpression='$b'
+	#	asrtExpression='$b'
 	#	eval echo \"$asrtExpression\"
 	# the expression won't trigger "unexpected EOF while looking for matching"
 	# however, the following will trigger this exception:
-	# Ex
+	# Ex:
 	#	b='"'
 	#	eval echo \"$b\"
 	# when the exception occurs, it's better to rewrite the test and encapsulate
