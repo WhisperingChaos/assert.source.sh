@@ -11,23 +11,25 @@
 # output to perform a regex comparison when comparing it to the generated output
 # instead of simple equality.
 assert_REGEX_COMPARE='<RegEx>'
-# assert_output functions accept only a single argument.  That argument, in most
-# cases should be the name of a bash function that writes to sysout.  
+# public assert_output_* functions expect a command as the first argument
+# followed by zero or more of its arguments.  Note - first argument can be 
+# compound - containing both a command and a single varable. ex: "echo hello"
+# but this form won't work for functions of two or more parameters due to 
+# bash's line spliting algorithm. 
 assert_output_true(){
-	assert__output_bool "$1" ' '
+	assert__output_bool ' ' "$@" 
 }
 assert_output_false(){ 
-	assert__output_bool "$1" '!'
+	assert__output_bool '!' "$@"
 }
 assert__output_bool(){
-	local -r asrtExpectedFn="$1"
 	# execute expected function before defining many other
 	# local variables to ensure generation function binds,
 	# if it needs to, to variables declared outside the
 	# scope of this function. 
 	local asrtFDesc
-	exec {asrtFDesc}< <( $asrtExpectedFn ) 
-	local -r asrtNegate="$2"
+	exec {asrtFDesc}< <( $2 "${@:3}" ) 
+	local -r asrtNegate="$1"
 
 	local asrtCompOper
 	local asrtEval
@@ -125,11 +127,11 @@ assert__bool(){
 }
 assert__msg_failed(){
 	echo "msg='${FUNCNAME[2]} failed'" >&2
-	echo "  $1" >&2
-	echo "  $2" >&2
-	echo "  lineNo=${BASH_LINENO[2]}" >&2
+	echo " +  $1" >&2
+	echo " +  $2" >&2
+	echo " +  lineNo=${BASH_LINENO[2]}" >&2
 	# indirectly called from failing test :: use [3] to identify it.
-	echo "  source='${BASH_SOURCE[3]}' func='${FUNCNAME[3]}'" >&2
+	echo " +  source='${BASH_SOURCE[3]}' func='${FUNCNAME[3]}'" >&2
 }
 # default implementation supporting asserts that immediately halt or continue
 assert__RAISED_SOMETIME_DURING_EXECUTION='false' 
