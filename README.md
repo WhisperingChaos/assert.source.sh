@@ -3,19 +3,19 @@ Provide common assertion library for testing.
 
 ### Public API
 
-assert_true <bashTest>
+#### assert_true \<bashTest\>
 
-assert_false <bashTest>
+#### assert_false \<bashTest\>
 
-assert_output_true <command> <argList>
+#### assert_output_true \<command\> [\<argList\>]
 
-assert_output_false <command> <argList>
+#### assert_output_false \<command\> [\<argList\>]
 
-assert_halt
+#### assert_halt
 
-assert_continue
+#### assert_continue
 
-assert_raised_check
+#### assert_raised_check
 
 ### References
 
