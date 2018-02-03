@@ -11,6 +11,7 @@
 # output to perform a regex comparison when comparing it to the generated output
 # instead of simple equality.
 assert_REGEX_COMPARE='<RegEx>'
+assert_INPUT_CMD_DELIMITER='---'
 # public assert_output_* functions expect a command as the first argument
 # followed by zero or more of its arguments.  Note - first argument can be 
 # compound - containing both a command and a single varable. ex: "echo hello"
@@ -27,9 +28,80 @@ assert__output_bool(){
 	# local variables to ensure generation function binds,
 	# if it needs to, to variables declared outside the
 	# scope of this function. 
+	local -i asrtPasInputPos
+	local -i asrtPasOutLen
+	assert__cmd_input_find 'asrtPasInputPos' 'asrtPasOutLen' "${@:2}"
 	local asrtFDesc
-	exec {asrtFDesc}< <( $2 "${@:3}" ) 
+	exec {asrtFDesc}< <( $2 "${@:3:$asrtPasOutLen-1}" ) 
 	local -r asrtNegate="$1"
+	local asrtIsCompareFail='true'
+	local asrtGeneratedCnt
+	local asrtExpectedCnt
+	while true; do
+		# read from STDIN first
+		local -i asrtPasGenInCnt
+		local -i asrtPasExptOutCnt
+		if [ "$asrtPasInputPos" -gt 0 ]; then
+			# read from provided input generation function
+			if ! assert__output_compare "$asrtNegate" "$asrtFDesc" 'asrtPasGenInCnt' 'asrtPasExptOutCnt' < <( ${@:$asrtPasInputPos+1:1} "${@:$asrtPasInputPos+2}" ); then
+				break
+			fi
+		elif ! assert__output_compare "$asrtNegate" "$asrtFDesc" 'asrtPasGenInCnt' 'asrtPasExptOutCnt'; then
+			break
+		fi
+		(( asrtGeneratedCnt = asrtPasGenInCnt ))
+		(( asrtExpectedCnt  = asrtPasExptOutCnt ))
+		while read -r -u $asrtFDesc; do
+			((asrtExpectedCnt++))
+		done
+		asrtIsCompareFail='false'
+		break
+	done
+	# always close file handle to expected output
+	eval exec $asrtFDesc\>\&\- 
+	if $asrtIsCompareFail; then
+		# note when participating in a pipe, recording and halting
+		# don't affect the parent process
+		assert__raised_record
+		assert__halt_check
+		return 1
+	fi
+	if [ $asrtGeneratedCnt -ne $asrtExpectedCnt ]; then 
+		assert__msg_failed "generatedCnt='$asrtGeneratedCnt'" "expected_Cnt='$asrtExpectedCnt'"	
+		# note when participating in a pipe, recording and halting
+		# don't affect the parent process
+		assert__raised_record
+		assert__halt_check
+		return 1
+	fi
+}
+
+assert__cmd_input_find(){
+	local -r asrtRtnInputPos="$1"
+	local -r asrtRtnOutLen="$2"
+	shift 2
+	local -i asrtOutLen=$#
+	local -i asrtInputPos=0
+	local -i asrtDelmPos
+	for (( asrtDelmPos=1; $# > 1; asrtDelmPos++ )){
+		if [ "$1" == "$assert_INPUT_CMD_DELIMITER" ]; then
+			(( asrtInputPos=asrtDelmPos + 1 ))
+			break
+		 fi
+	shift
+	}
+	if [ $asrtInputPos -gt 0 ]; then
+		(( asrtOutLen = asrtInputPos - 2 ))
+	fi
+	eval $asrtRtnInputPos=\$asrtInputPos
+	eval $asrtRtnOutLen=\$asrtOutLen
+}
+
+assert__output_compare(){
+	local -r asrtNegate="$1"
+	local -r asrtFDesc="$2"
+	local -r asrtRtnGenInCnt="$3"
+	local -r asrtRtnExptOutCnt="$4"
 
 	local asrtCompOper
 	local asrtEval
@@ -64,30 +136,14 @@ assert__output_bool(){
 			eval $asrtNegate \[\[ \"\$asrtGenerated\" =~ \$asrtExpected \]\] \|\| asrtEval\=\'false\'
 		fi
 		if ! $asrtEval; then
-			eval exec $asrtFDesc\<\&\-
 			assert__msg_failed "generated='$asrtGenerated'" "expected_='$asrtExpected'"	
-			# note when participating in a pipe, recording and halting
-			# don't affect the parent process
-			assert__raised_record
-			assert__halt_check
 			return 1
 		fi
 	done
-	while read -r -u $asrtFDesc; do
-		((asrtExpectedCnt++))
-	done
-	eval exec $asrtFDesc\>\&\- 
-	if [ $asrtGeneratedCnt -ne $asrtExpectedCnt ]; then 
-		echo "msg='${FUNCNAME[1]} failed'" >&2
-		assert__msg_failed "generatedCnt='$asrtGeneratedCnt'" "expected_Cnt='$asrtExpectedCnt'"	
-		# note when participating in a pipe, recording and halting
-		# don't affect the parent process
-		assert__raised_record
-		assert__halt_check
-		return 1
-	fi
-	true
+	eval $asrtRtnGenInCnt=\"\$asrtGeneratedCnt\"
+	eval $asrtRtnExptOutCnt=\"\$asrtExpectedCnt\"
 }
+
 assert_true(){
 	assert__bool "$1" ' '
 }
@@ -151,6 +207,6 @@ assert__raised_record(){
 assert__halt_check(){
 	return 1
 }
-assert_raised_check(){
+assert_return_code_set(){
 	! $assert__RAISED_SOMETIME_DURING_EXECUTION
 }
