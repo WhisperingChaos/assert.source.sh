@@ -4,9 +4,9 @@ Provide common assertion library for testing.
 ### Public API
 
 #### assert_true \<bashTestEncapsulted\>
-Generate message indicating failure of affirmed condition when **\<bashTestEncapsulated\>** evaluates to *false*.  Otherwise, be silent.
+Generate message indicating failure of stated condition when **\<bashTestEncapsulated\>** evaluates to *false*.  Otherwise, be silent.
 
-  - **\<bashTestEncapsulated\>**
+  - **\<bashTestEncapsulated\>** any bash [conditional expression](https://www.gnu.org/software/bash/manual/html_node/Bash-Conditional-Expressions.html) cocooned to satisfy its parser so it treats the expression as a single argument.  This delays the expression's evaluation so it can occur within the implementation of the **assert_true** function. 
 
 
 
