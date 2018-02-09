@@ -7,6 +7,11 @@
 #	private to this include	file - they should only be used/called by functions
 #	within it.
 
+# initialize default behavior
+assert_source_init(){
+	assert_bool_performant
+	assert_continue
+}
 # use this public constant variable to prefix the lines in the expected test
 # output to perform a regex comparison when comparing it to the generated output
 # instead of simple equality.
@@ -35,18 +40,25 @@ assert__output_bool(){
 	exec {asrtFDesc}< <( $2 "${@:3:$asrtPasOutLen-1}" ) 
 	local -r asrtNegate="$1"
 	local asrtIsCompareFail='true'
-	local asrtGeneratedCnt
-	local asrtExpectedCnt
+	local -i asrtGeneratedCnt
+	local -i asrtExpectedCnt
+	local asrtPasExpectedOuptput
+	local asrtPasGeneratedOuptput
 	while true; do
 		# read from STDIN first
 		local -i asrtPasGenInCnt
 		local -i asrtPasExptOutCnt
 		if [ "$asrtPasInputPos" -gt 0 ]; then
 			# read from provided input generation function
-			if ! assert__output_compare "$asrtNegate" "$asrtFDesc" 'asrtPasGenInCnt' 'asrtPasExptOutCnt' < <( ${@:$asrtPasInputPos+1:1} "${@:$asrtPasInputPos+2}" ); then
+			if ! assert__output_compare "$asrtNegate" "$asrtFDesc"	\
+				'asrtPasGenInCnt' 'asrtPasExptOutCnt'				\
+				'asrtPasGeneratedOutput' 'asrtPasExpectedOutput'	\
+			   	< <( ${@:$asrtPasInputPos+1:1} "${@:$asrtPasInputPos+2}" ); then
 				break
 			fi
-		elif ! assert__output_compare "$asrtNegate" "$asrtFDesc" 'asrtPasGenInCnt' 'asrtPasExptOutCnt'; then
+		elif ! assert__output_compare "$asrtNegate" "$asrtFDesc"	\
+				'asrtPasGenInCnt' 'asrtPasExptOutCnt'				\
+				'asrtPasGeneratedOutput' 'asrtPasExpectedOutput'; then
 			break
 		fi
 		(( asrtGeneratedCnt = asrtPasGenInCnt ))
@@ -57,17 +69,22 @@ assert__output_bool(){
 		asrtIsCompareFail='false'
 		break
 	done
-	# always close file handle to expected output
+	# always close expected output file handle
 	eval exec $asrtFDesc\>\&\- 
 	if $asrtIsCompareFail; then
 		# note when participating in a pipe, recording and halting
 		# don't affect the parent process
+		assert__msg_failed							\
+			"generated='$asrtPasGeneratedOutput'"	\
+	   		"expected_='$asrtPasExpectedOutput'"	
 		assert__raised_record
 		assert__halt_check
 		return 1
 	fi
 	if [ $asrtGeneratedCnt -ne $asrtExpectedCnt ]; then 
-		assert__msg_failed "generatedCnt='$asrtGeneratedCnt'" "expected_Cnt='$asrtExpectedCnt'"	
+		assert__msg_failed						\
+			"generatedCnt='$asrtGeneratedCnt'"	\
+			"expected_Cnt='$asrtExpectedCnt'"
 		# note when participating in a pipe, recording and halting
 		# don't affect the parent process
 		assert__raised_record
@@ -75,7 +92,6 @@ assert__output_bool(){
 		return 1
 	fi
 }
-
 assert__cmd_input_find(){
 	local -r asrtRtnInputPos="$1"
 	local -r asrtRtnOutLen="$2"
@@ -96,12 +112,13 @@ assert__cmd_input_find(){
 	eval $asrtRtnInputPos=\$asrtInputPos
 	eval $asrtRtnOutLen=\$asrtOutLen
 }
-
 assert__output_compare(){
 	local -r asrtNegate="$1"
 	local -r asrtFDesc="$2"
 	local -r asrtRtnGenInCnt="$3"
 	local -r asrtRtnExptOutCnt="$4"
+	local -r asrtRtnGeneratedOuptput="$5"
+	local -r asrtRtnExpectedOuptput="$6"
 
 	local asrtCompOper
 	local asrtEval
@@ -136,51 +153,32 @@ assert__output_compare(){
 			eval $asrtNegate \[\[ \"\$asrtGenerated\" =~ \$asrtExpected \]\] \|\| asrtEval\=\'false\'
 		fi
 		if ! $asrtEval; then
-			assert__msg_failed "generated='$asrtGenerated'" "expected_='$asrtExpected'"	
+			eval $asrtRtnGeneratedOuptput=\"\$asrtGenerated\"
+			eval $asrtRtnExpectedOuptput=\"\$asrtExpected\"
 			return 1
 		fi
 	done
 	eval $asrtRtnGenInCnt=\"\$asrtGeneratedCnt\"
 	eval $asrtRtnExptOutCnt=\"\$asrtExpectedCnt\"
 }
-
 assert_true(){
-	assert__bool "$1" ' '
+	assert__bool "$1" ' ' "${@:2}"
 }
 assert_false(){
 	assert__bool "$1" '!'
 }
 assert__bool(){
-	local -r asrtExpression="$1"
-	local -r asrtNegate="$2"
-
-	if eval $asrtNegate $asrtExpression; then
-		return
-	fi
-	# messaging will fail if asrtExpression contains an unbalanced number of
-   	# double quotes and the odd one isn't excaped - \" .  it may also succeed
-	# but may be missing double quotes as the added enclosing ones below 
-	# trigger string concatenation.  This is usually not an issue when the
-	# asrtExpression variable encapsulates all strings in variables, as bash will properly
-	# escape all quotes using either concatenation or '\'.
-	# Ex:
-	#	b='"'
-	#	asrtExpression='$b'
-	#	eval echo \"$asrtExpression\"
-	# the expression won't trigger "unexpected EOF while looking for matching"
-	# however, the following will trigger this exception:
-	# Ex:
-	#	b='"'
-	#	eval echo \"$b\"
-	# when the exception occurs, it's better to rewrite the test and encapsulate
-	# the argument within a variable as other corrective mechanisms, like capturing
-   	#	set -x or using a trap don't work very well and diminish performance.
-	#
-	eval assert__msg_failed \"expression\=\$asrtNegate \$asrtExpression\" \
-		\'evalExpres\=\'\"\$asrtNegate\ \"\"$asrtExpression\"
+	assert__msg_failed							\
+		"Must select assert's implementation."	\
+   		"Call either: assert_performant or assert_detailed."
 	assert__raised_record
 	assert__halt_check
 }
+
+assert__condition_code_set(){
+	return $1
+}
+
 assert__msg_failed(){
 	echo "msg='${FUNCNAME[2]} failed'" >&2
 	echo " +  $1" >&2
@@ -188,6 +186,89 @@ assert__msg_failed(){
 	echo " +  lineNo=${BASH_LINENO[2]}" >&2
 	# indirectly called from failing test :: use [3] to identify it.
 	echo " +  source='${BASH_SOURCE[3]}' func='${FUNCNAME[3]}'" >&2
+}
+###############################################################################
+#
+#	functions below adapt the public implementations defined above.
+#
+###############################################################################
+assert_bool_performant(){
+	assert__bool(){
+	local -r asrtErrorCode="$?"
+	local -r asrtExpression="$1"
+	local -r asrtNegate="$2"
+
+	# eliminate two static arguments to align this routine's $1-N with callers.
+	# allows caller to encapsulate references to its $1-N, eliminating difficult
+	# string concatenation/escaping when defining tests. 
+	shift 2
+	# set condition code so $? reference reflects the instruction immediately
+	# prior to the current assert call.  Allows caller to encapsulate $?
+	# reference with same benefts as described above.
+	assert__condition_code_set $asrtErrorCode
+	# performant as simple eval within existing shell - no forking required
+	# nor output captured. Also, evaluation syntax failure will cause current
+	# shell, the one running asserts, to abnormally terminate with the syntax error
+	if eval $asrtNegate $asrtExpression; then
+		return
+	fi
+	# Reveal $variables to better diagnose reason for assertion 
+	# failure.  Requires running eval on the expression.  However, as best
+    # as possible, limit this evaluation to only variable substitution,
+	# to avoid possible secondary side effects, that could result in disaster. 
+	# Essentially, your fully responsible for the outcome during the first
+    # complete evaluation of the assert.  You're also fully responsible for 
+	# the effects of the second evaluation below, however, the code attempts
+	# to limit the scope of this second evaluation to variable substitution
+	# to avoid harmful side effects.  "attempts" means that the code below
+   	# isn't guaranteed to restrict evaluation to only variable
+	# substitutions but it's fairly robust given its simplicity.
+	#
+	# Finally, simply exposing the $variable values is typically enough in most
+	# cases to deterine the cause of an assert failure. 
+
+	# eliminate delimiters that cause spawning of shells and redirection of output 
+	local asrtExpEval="$( echo "$asrtExpression" | sed -e 's/\([()`"|><]\)/\\\1/g' )" 
+	assert__condition_code_set $asrtErrorCode
+	# quotes within echo to preserve spaces.  Won't work in all situations.
+  	asrtExpEval="$( eval echo \"$asrtExpEval\" )"
+	assert__msg_failed								\
+		"expression=$asrtNegate $asrtExpression"	\
+   		"evalExpres=$asrtNegate $asrtExpEval"
+	assert__raised_record
+	assert__halt_check
+	}
+}
+assert_bool_detailed(){
+	assert__bool(){
+	local -ri asrtErrorCode=$?
+
+	local asrtOutputCapture
+	asrtOutputCapture="$(assert__bool_encap "$1" "$2" "$asrtErrorCode" "${@:2}" 2>&1)"
+	if [ $? -eq 0 ]; then return; fi
+	assert__msg_failed		\
+		"expression=$2 $1"	\
+   		"see set -x output below:"
+	echo "$asrtOutputCapture"
+	assert__raised_record
+	assert__halt_check
+	}
+}
+assert__bool_encap(){
+	local -r asrtExpression="$1"
+	local -r asrtNegate="$2"
+	local -r asrtErrorCode="$3"
+
+	# eliminate three static arguments to align this routine's $1-N with callers.
+	# allows caller to encapsulate references to its $1-N, eliminating difficult
+	# string concatenation/escaping when defining tests. 
+	shift 3
+	set -x
+	# set condition code so $? reference reflects the instruction immediately
+	# prior to the current assert call.  Allows caller to encapsulate $?
+	# reference with same benefts as described above.
+	assert__condition_code_set $asrtErrorCode
+	eval $asrtNegate $asrtExpression; 
 }
 # default implementation supporting asserts that immediately halt or continue
 assert__RAISED_SOMETIME_DURING_EXECUTION='false' 
@@ -210,3 +291,4 @@ assert__halt_check(){
 assert_return_code_set(){
 	! $assert__RAISED_SOMETIME_DURING_EXECUTION
 }
+assert_source_init
