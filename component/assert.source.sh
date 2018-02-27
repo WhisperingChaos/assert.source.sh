@@ -23,7 +23,7 @@ assert_INPUT_CMD_DELIMITER='---'
 # but this form won't work for functions of two or more parameters due to 
 # bash's line spliting algorithm. 
 assert_output_true(){
-	assert__output_bool ' ' "$@" 
+	assert__output_bool ' ' "$@"
 }
 assert_output_false(){ 
 	assert__output_bool '!' "$@"
@@ -37,7 +37,7 @@ assert__output_bool(){
 	local -i asrtPasOutLen
 	assert__cmd_input_find 'asrtPasInputPos' 'asrtPasOutLen' "${@:2}"
 	local asrtFDesc
-	exec {asrtFDesc}< <( $2 "${@:3:$asrtPasOutLen-1}" ) 
+	exec {asrtFDesc}< <( $2 "${@:3:$asrtPasOutLen}" ) 
 	local -r asrtNegate="$1"
 	local asrtIsCompareFail='true'
 	local -i asrtGeneratedCnt
@@ -104,10 +104,12 @@ assert__cmd_input_find(){
 			(( asrtInputPos=asrtDelmPos + 1 ))
 			break
 		 fi
-	shift
+		shift
 	}
 	if [ $asrtInputPos -gt 0 ]; then
 		(( asrtOutLen = asrtInputPos - 2 ))
+	elif [ $asrtOutLen -gt 0 ]; then
+		(( asrtOutLen-- ))	
 	fi
 	eval $asrtRtnInputPos=\$asrtInputPos
 	eval $asrtRtnOutLen=\$asrtOutLen
@@ -165,7 +167,7 @@ assert_true(){
 	assert__bool "$1" ' ' "${@:2}"
 }
 assert_false(){
-	assert__bool "$1" '!'
+	assert__bool "$1" '!' "${@:2}"
 }
 assert__bool(){
 	assert__msg_failed							\
@@ -227,7 +229,7 @@ assert_bool_performant(){
 	# Finally, simply exposing the $variable values is typically enough in most
 	# cases to deterine the cause of an assert failure. 
 
-	# eliminate delimiters that cause spawning of shells and redirection of output 
+	# escape delimiters that cause spawning of shells and redirection of output 
 	local asrtExpEval="$( echo "$asrtExpression" | sed -e 's/\([()`"|><]\)/\\\1/g' )" 
 	assert__condition_code_set $asrtErrorCode
 	# quotes within echo to preserve spaces.  Won't work in all situations.
@@ -244,7 +246,7 @@ assert_bool_detailed(){
 	local -ri asrtErrorCode=$?
 
 	local asrtOutputCapture
-	asrtOutputCapture="$(assert__bool_encap "$1" "$2" "$asrtErrorCode" "${@:2}" 2>&1)"
+	asrtOutputCapture="$(assert__bool_encap "$1" "$2" "$asrtErrorCode" "${@:3}" 2>&1)"
 	if [ $? -eq 0 ]; then return; fi
 	assert__msg_failed		\
 		"expression=$2 $1"	\
@@ -258,7 +260,6 @@ assert__bool_encap(){
 	local -r asrtExpression="$1"
 	local -r asrtNegate="$2"
 	local -r asrtErrorCode="$3"
-
 	# eliminate three static arguments to align this routine's $1-N with callers.
 	# allows caller to encapsulate references to its $1-N, eliminating difficult
 	# string concatenation/escaping when defining tests. 
