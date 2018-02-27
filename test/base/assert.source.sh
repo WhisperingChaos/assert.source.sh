@@ -1,0 +1,1 @@
+../../component/assert.source.sh
