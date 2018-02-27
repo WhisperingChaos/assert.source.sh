@@ -1,5 +1,5 @@
 # assert.source.sh
-Provide yet another assertion library for testing.
+Provide yet another assertion library for testing.  Primarily for Bash scripting but can be broadly applied to CLI programs that affect environment variables or generate output.
 
 ### Public API
 
@@ -10,6 +10,7 @@ Generate message indicating failure of stated condition when **\<bashTestEncapsu
 ```
 pasContext="unexpected context"
 assert_true '[ "$pasContext" == "expected context" ]' 
+```
 
 
 
