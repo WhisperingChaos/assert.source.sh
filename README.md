@@ -20,9 +20,9 @@ Generate message indicating failure of stated condition when **\<bashTestEncapsu
     AdminNm 'admin'
   ```
 #### assert_false \<bashTestEncapsulted\> ["${@}"]
-Negated form of *assert_true*
+Negated form of *assert_true*.
 
-#### assert_output_true \<commandExpected\> [\<argList\>] [<\inputDelim\> \<command_Generate\> [<arglist]]
+#### assert_output_true \<commandExpected\> [\<argList\>] [\<inputDelim\> \<command_Generate\> [\<arglist\>]]
 
 #### assert_output_false \<command\> [\<argList\>]
 Negated form of *assert_output_true*.
