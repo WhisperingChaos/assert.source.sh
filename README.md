@@ -22,7 +22,10 @@ Generate message indicating failure of stated condition when **\<bashTestEncapsu
 #### assert_false \<bashTestEncapsulted\> ["${@}"]
 Negated form of *assert_true*.
 
-#### assert_output_true \<commandExpected\> [\<argList\>] [\<inputDelim\> \<command_Generate\> [\<arglist\>]]
+#### assert_output_true \<commandExpected\> [\<argList\>] [\<inputDelim\> \<commandGenerate\> [\<argList\>]]
+Compares the output, produced by \<commandGenerate\> to the output produced by \<commandExpected\>.  The first comparison failue between these outputs produces a message.  Otherwise, be silent (all outputs match).  Comparison failures include situations where one command produces more output than the other one.
+
+The comparision function uses the Bash *read* command to consume the output produced by both commands which populate an environment variable.   This function offers two comparision operators 
 
 #### assert_output_false \<command\> [\<argList\>]
 Negated form of *assert_output_true*.
