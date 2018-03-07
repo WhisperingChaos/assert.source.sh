@@ -23,9 +23,13 @@ Generate message indicating failure of stated condition when **\<bashTestEncapsu
 Negated form of *assert_true*.
 
 #### assert_output_true \<commandExpected\> [\<argList\>] [\<inputDelim\> \<commandGenerate\> [\<argList\>]]
-Compares the output, produced by \<commandGenerate\> to the output produced by \<commandExpected\>.  The first comparison failue between these outputs produces a message.  Otherwise, be silent (all outputs match).  Comparison failures include situations where one command produces more output than the other one.
+Compares the output, produced by \<commandGenerate\> to the output produced by \<commandExpected\>.  The first comparison failue between these outputs produces an error message.  Otherwise, be silent (all outputs match).  Comparison failures include situations where one command produces more output than the other one.
 
-The comparision function uses the Bash *read* command to consume the output produced by both commands which populate an environment variable.   This function offers two comparision operators 
+The comparision function uses the Bash *read* command to consume the output produced by both commands. Each *read* command transfers its data into an environment variable.  The content of the two environment variables are then compared to identify differences between the outputs produced by \<commandGenerate\> and \<commandExpected\>.  When devised, human readable text was expected as the output supplied by \<commandGenerate\> and \<commandExpected\>. Essentially, a smallish number of typically newline terminated text. However, *read* also consumes any data streamed via STDIN, including the contents of executable files.  Therefore, one can compare the contents of non-human readable files as long as there's enough memory to maintain two, potentially complete, in memory replicas.  Furthermore, the comparison function offers both regular expresssion and simple equality matching.
+
+The comparision function 
+
+
 
 #### assert_output_false \<command\> [\<argList\>]
 Negated form of *assert_output_true*.
