@@ -36,6 +36,40 @@ Negated form of *assert_output_true*.
 
 #### assert_return_code_set
 
+### Terms
+#### Cocoon
+An expression encaspulation mechanism that prevents immediate evaluation.
+Mechanisms include:
+  * Bash single quoting.  When single quotes must themselves be encapsulated, Bash offers string concatenation.  
+  ```
+  $ echo 'encapsulated string: ">|#()<?[{}]:!'
+  encapsulated string: ">|#()<?[{}]:!
+  ```
+  * Bash string concatenation.
+  ```
+  $ echo 'encapsulated string including single quote: ">|#()<?'"'"'[{}]:!'
+  encapsulated string including single quote: ">|#()<?'[{}]:!
+  ```
+  * Bash single character concatenation.
+  ```
+  $ echo 'encapsulated string: ">|#()<?'\'\e\f\g'[{}]:!'
+  encapsulated string: ">|#()<?'efg[{}]:!
+  ```
+  * Indirect expression evaluation via Bash function call.
+```
+#!/bin/bash
+source ../component/assert.source.sh
+express_encap(){
+    [ "$1" == 'Beautiful' ] && ([ "$2" == "Morning" ] || [ "$2" == 'Evening' ]) 
+}
+sunrise(){
+    assert_true 'express_encap "${@}"' "${@}"
+}
+sunrise 'Beautiful' 'Morning'
+```
+  
+  
+
 ### References
 
 [lehmannro/assert.sh](https://github.com/lehmannro/assert.sh)
