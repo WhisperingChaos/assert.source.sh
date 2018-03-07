@@ -23,11 +23,11 @@ Generate message indicating failure of stated condition when **\<bashTestEncapsu
 Negated form of [assert_true](https://github.com/WhisperingChaos/assert.source.sh/blob/master/README.md#assert_true-bashtestencapsulted-).
 
 #### assert_output_true \<commandExpected\> [\<argList\>] [\<inputDelim\> \<commandGenerate\> [\<argList\>]]
-Compares the output, produced by \<commandGenerate\> to the output produced by \<commandExpected\>.  The first comparison failue between these outputs produces an error message.  Otherwise, be silent (all outputs match).  Comparison failures include situations where one command produces more output than the other one.
-  * **\<commandExpected\>** An addressible bash function or CLI command whose STDOUT will be consumed as input by **assert_output_true**.  Each output line can be optionally prefixed by a string defined by *assert_REGEX_COMPARE* to dynamically switch between an exact or regex pattern match.  See below for details.   
+Compares the output, produced by **\<commandGenerate\>** to the output produced by **\<commandExpected\>**.  The first comparison failue between these outputs produces an error message.  Otherwise, be silent (all outputs match).  Comparison failures include situations where one command produces more output than the other one.
+  * **\<commandExpected\>** An addressible bash function or CLI command whose STDOUT will be consumed as input by **assert_output_true**.  Each output line can be optionally prefixed by *${assert_REGEX_COMPARE}* *('\<RegEx\>')* to dynamically switch between an exact or regex pattern match.  When the comparison function detects *${assert_REGEX_COMPARE}*, this prefix is removed before performing the regex pattern matching. See below for details.   
   * **[\<argList\>]** An optional list of arguments passed to  **\<commandExpected\>**
-  * **[\<inputDelim\> \<commandGenerate\> [\<argList\>]]** An alternate form, different from piping *(|)*, to capture the output of the **\<commandGenerate\>** function.  This form is generally simpler to ensure proper assertion behavior.  A more indepth explaination follows.
-    * **\<inputDelim\>** A pattern separating the invocation and associated parameters of **\<commandExpected\>** from **\<commandGenerate\>**.  It's defined by *assert_INPUT_CMD_DELIMITER* whose default value is '---'.
+  * **[\<inputDelim\> \<commandGenerate\> [\<argList\>]]** An alternate form, different from piping *(|)*, to capture the output of the **\<commandGenerate\>** function.  This form is generally simpler to encode than piping and ensures proper assertion behavior.  A more indepth explaination follows.
+    * **\<inputDelim\>** A pattern separating the invocation and associated parameters of **\<commandExpected\>** from **\<commandGenerate\>**.  It's defined by *${assert_INPUT_CMD_DELIMITER}* *('---')*.
     * **\<commandGenerate\>** An addressible bash function or CLI command whose STDOUT will be consumed unaltered by **assert_output_true** and compared to **\<commandExpected\>**.
     * **[\<argList\>]** An optional argument list passed into **\<commandExpected\>**.
     
