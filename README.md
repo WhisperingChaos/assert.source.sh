@@ -20,7 +20,7 @@ Generate message indicating failure of stated condition when **\<bashTestEncapsu
     AdminNm 'admin'
   ```
 #### assert_false \<bashTestEncapsulted\> ["${@}"]
-Negated form of *assert_true*.
+Negated form of [assert_true](https://github.com/WhisperingChaos/assert.source.sh/blob/master/README.md#assert_true-bashtestencapsulted-).
 
 #### assert_output_true \<commandExpected\> [\<argList\>] [\<inputDelim\> \<commandGenerate\> [\<argList\>]]
 Compares the output, produced by \<commandGenerate\> to the output produced by \<commandExpected\>.  The first comparison failue between these outputs produces an error message.  Otherwise, be silent (all outputs match).  Comparison failures include situations where one command produces more output than the other one.
