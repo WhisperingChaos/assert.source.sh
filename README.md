@@ -27,7 +27,7 @@ Compares the output, produced by \<commandGenerate\> to the output produced by \
 
 The comparision function uses the Bash *read* command to consume the output produced by both commands. Each *read* command transfers its data into an environment variable.  The content of the two environment variables are then compared to identify differences between the outputs produced by \<commandGenerate\> and \<commandExpected\>.  When devised, human readable text was expected as the output supplied by \<commandGenerate\> and \<commandExpected\>. Essentially, a smallish number of typically newline terminated text. However, *read* also consumes any data streamed via STDIN, including the contents of executable files.  Therefore, one can compare the contents of non-human readable files as long as there's enough memory to maintain two, potentially complete, in memory replicas.  Furthermore, the comparison function offers both regular expresssion and simple equality matching.
 
-The comparision function 
+Equality matching performs an exact binary comparision between a newline delimited block of bytes read from \<commandExpected\> correlated to a corresponding newline delimited block of bytes read from \<commandExpected\>.  Although this uncompromising form of comparision offers a generally useful operator, it can be dynamically replaced by a regular expression comparator providing adaptive/flexible pattern matching.  To dynamically specify a regular expression comparator, the \<commandExpected\> would apply a prefix to each newline delimited byte block. This prefix triggers the comparision function to select Bash's regular expression operator ( instead of Bash's exact string match one.
 
 
 
