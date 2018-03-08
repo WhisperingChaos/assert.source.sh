@@ -94,8 +94,38 @@ After invoking this function, the next failure detected by an assertion will cau
 #### assert_continue
 After invoking this function, the current process will continue execution through failures detected by subsequent assertions.  When assertion failures occur in this mode, the fact that a failure occurred is remembered.  This is the default behavior of this assertion library.  Once testing completes, the **assert_return_code_set** can be called to establish the return code value for the entire test.  
 
+#### assert_bool_performant
+Implements the evaluation of **assert_true** within the current process. Therefore, incorrectly formed **\<bashTestEncapsulted\>** will terminate the current process.  Also, an evaluation violating the constraint enforced by an assert is performed a second time in order to generate a useful message.  The code attempts to limit this second evaluation to only environment variables, as evaluating other expressions, like those used to start a subprocess, may result in undesirable side effects when executed a second time.  In general, limiting evaluation to only environment variables is usually sufficient to debug the assert failure.  However, in certain situations, a more detailed evaluation of the expression can be produced using **assert_bool_detailed**
+
+The assert library uses this performant form as its default implementation.
+```
+# by default, don't have to call assert_bool_performant
+assert_bool_performant
+assert_false '[ "$1" == "b"]'
+assert_true '[ "$1" == "a" ]'
+.
+.
+```
+#### assert_bool_detailed
+Implements the evaluation of **assert_true** within a subprocess of the current one.  It uses set -x and captures its output providing detailed evaluation of the entire **\<bashTestEncapsulted\>** expression.  Capturing is performed as the expression is evaluated, therefore, a second evaluation, to generate a message when the assert fails isn't required, as is the case when using **assert_bool_performant**.  Due to subprocess spawning, **assert_bool_detailed** is resilient to problematic expressions that would cause the performant implementation to abnormally terminate its current process.  However, it does fork a subshell which "costs" some amount of time and resources.
+
+Typically, its more resource efficient and speedier to use the implementation of **assert_bool_performant**.  However, since either implementation can dynamically replace the other, it might be advisable to use **assert_bool_detailed** when first developing a test script, due to its reliability and detailed evaluation output, then simply replace it with **assert_bool_performant** once the test script becomes "stable".
+```
+# using detailed implementation of assert_true
+assert_bool_detailed
+assert_true '[ "$1" == "$( echo "b") ]'
+.
+.
+# replace detailed implenentation of assert_true with performant version
+assert_bool_performant
+assert_false '[ "$1" == "b"]'
+assert_true '[ "$1" == "a" ]'
+.
+.
+```
+
 #### assert_return_code_set
-A function whose execution sets the return code for the process.  Should be the last command executed the test script.
+A function whose execution sets the return code for the process.  Should be the last command executed by the test script.
 
 ### Terms
 #### Cocoon
