@@ -37,7 +37,12 @@ assert__output_bool(){
 	local -i asrtPasOutLen
 	assert__cmd_input_find 'asrtPasInputPos' 'asrtPasOutLen' "${@:2}"
 	local asrtFDesc
-	exec {asrtFDesc}< <( $2 "${@:3:$asrtPasOutLen}" ) 
+	if [ "$2" == "$assert_INPUT_CMD_DELIMITER" ] || [ $# -eq 1 ]; then
+		# expected output is empty
+		exec {asrtFDesc}< <( : ) 
+	else
+		exec {asrtFDesc}< <( $2 "${@:3:$asrtPasOutLen}" )
+	fi
 	local -r asrtNegate="$1"
 	local asrtIsCompareFail='true'
 	local -i asrtGeneratedCnt
@@ -49,11 +54,14 @@ assert__output_bool(){
 		local -i asrtPasGenInCnt
 		local -i asrtPasExptOutCnt
 		if [ "$asrtPasInputPos" -gt 0 ]; then
+			local asrtCmmndGen="${@:$asrtPasInputPos+2:1}" 
+			asrtCmmndGen="${asrtCmmndGen:-:}"
+			# asrtCmmndGen="${asrtCmmmdGen:-:}"
 			# read from provided input generation function
 			if ! assert__output_compare "$asrtNegate" "$asrtFDesc"	\
 				'asrtPasGenInCnt' 'asrtPasExptOutCnt'				\
 				'asrtPasGeneratedOutput' 'asrtPasExpectedOutput'	\
-			   	< <( ${@:$asrtPasInputPos+1:1} "${@:$asrtPasInputPos+2}" ); then
+			   	< <( $asrtCmmndGen "${@:$asrtPasInputPos+3}" ); then
 				break
 			fi
 		elif ! assert__output_compare "$asrtNegate" "$asrtFDesc"	\
@@ -81,7 +89,26 @@ assert__output_bool(){
 		assert__halt_check
 		return 1
 	fi
-	if [ $asrtGeneratedCnt -ne $asrtExpectedCnt ]; then 
+
+	if [ $asrtGeneratedCnt -eq 0 ] && [ $asrtExpectedCnt -eq 0 ] && [ "$asrtNegate" == '!' ]; then
+		# nothing generated but expect something due to 'assert_output_false'
+		# provided nothing to expect :: expecting at least something.
+		assert__msg_failed				\
+			"generated='nothing'"		\
+			"expected_='something'"
+		# note when participating in a pipe, recording and halting
+		# don't affect the parent process
+		assert__raised_record
+		assert__halt_check
+		return 1
+	fi
+	if eval \[ \$asrtGeneratedCnt \-ne \$asrtExpectedCnt \]  \&\& $asrtNegate true ; then 
+		# assert_output_true must inspect and apply the comparision operator
+		# to the output list containing the most elements.  Therefore a mismatch 
+		# signals ether expected or generated output that hasn't been compared.   
+		# assert_output_false ensures that every element compared in the smallest
+	    # defined set fails and considers absence of not expected elements
+		# or not generated ones as a failure that affirms this assertion.
 		assert__msg_failed						\
 			"generatedCnt='$asrtGeneratedCnt'"	\
 			"expected_Cnt='$asrtExpectedCnt'"
@@ -99,15 +126,15 @@ assert__cmd_input_find(){
 	local -i asrtOutLen=$#
 	local -i asrtInputPos=0
 	local -i asrtDelmPos
-	for (( asrtDelmPos=1; $# > 1; asrtDelmPos++ )){
+	for (( asrtDelmPos=1; $# > 0; asrtDelmPos++ )){
 		if [ "$1" == "$assert_INPUT_CMD_DELIMITER" ]; then
-			(( asrtInputPos=asrtDelmPos + 1 ))
+			(( asrtInputPos=asrtDelmPos ))
 			break
 		 fi
 		shift
 	}
 	if [ $asrtInputPos -gt 0 ]; then
-		(( asrtOutLen = asrtInputPos - 2 ))
+		(( asrtOutLen = asrtInputPos - 1 ))
 	elif [ $asrtOutLen -gt 0 ]; then
 		(( asrtOutLen-- ))	
 	fi
@@ -130,9 +157,11 @@ assert__output_compare(){
 	local asrtExpectedCnt=0
 	while read -r asrtGenerated; do
 		((asrtGeneratedCnt++))
-		if read -r -u $asrtFDesc asrtExpected; then
-			((asrtExpectedCnt++))
+		if ! read -r -u $asrtFDesc asrtExpected; then
+			# expected finished but now exhaust generated to update its counter.
+			continue
 		fi
+		((asrtExpectedCnt++))
 		asrtCompOper='true'
 		if [[ "${asrtExpected:0:${#assert_REGEX_COMPARE}}" == "$assert_REGEX_COMPARE" ]]; then
 			asrtCompOper='false'
