@@ -407,6 +407,33 @@ test_assert_output_true(){
 		| test_compare_output test_assert_output_true_multi_line_regex_fail_out; then
 		test_failure_msg
 	fi
+	if ! cat /bin/bash | assert_output_true 'cat /bin/bash'; then
+		test_failure_msg
+	fi
+	if ! : | assert_output_true; then
+		test_failure_msg
+	fi
+	if ! assert_output_true --- :; then 
+		test_failure_msg
+	fi
+	if ! assert_output_true ---; then 
+		test_failure_msg
+	fi
+	if ! echo "a" 					\
+		| assert_output_true 2>&1	\
+		| test_compare_output test_assert_output_true_something_when_expecting_nothing; then
+		test_failure_msg
+	fi
+	if ! test_assert_output_true_generated_more_than_expected			\
+		| assert_output_true test_assert_output_true_multi_line	2>&1	\
+		| test_compare_output test_assert_output_true_generated_more_than_expected_out; then 
+		test_failure_msg
+	fi
+	if ! test_assert_output_true_generated_less_than_expected			\
+		| assert_output_true test_assert_output_true_multi_line 2>&1	\
+		| test_compare_output test_assert_output_true_generated_less_than_expected_out; then 
+		test_failure_msg
+	fi
 }
 test_assert_output_true_hi_ne_bye(){
 cat <<BODY
@@ -483,6 +510,48 @@ msg='assert_output_true failed'
  +  source='./assert.source_test.sh' func='test_assert_output_true'
 BODY
 }
+test_assert_output_true_something_when_expecting_nothing(){
+cat <<BODY
+msg='assert_output_true failed'
+ +  generatedCnt='1'
+ +  expected_Cnt='0'
+ +  lineNo=420
+ +  source='./assert.source_test.sh' func='test_assert_output_true'
+BODY
+}
+test_assert_output_true_generated_more_than_expected(){
+cat <<BODY
+line_1
+line_2
+line_3
+line_4
+BODY
+}
+test_assert_output_true_generated_more_than_expected_out(){
+cat <<BODY
+msg='assert_output_true failed'
+ +  generatedCnt='4'
+ +  expected_Cnt='3'
+ +  lineNo=428
+ +  source='./assert.source_test.sh' func='test_assert_output_true'
+BODY
+}
+test_assert_output_true_generated_less_than_expected(){
+cat <<BODY
+line_1
+line_2
+BODY
+}
+test_assert_output_true_generated_less_than_expected_out(){
+cat <<BODY
+msg='assert_output_true failed'
+ +  generatedCnt='2'
+ +  expected_Cnt='3'
+ +  lineNo=433
+ +  source='./assert.source_test.sh' func='test_assert_output_true'
+BODY
+}
+
 
 
 test_assert_output_false(){
@@ -502,6 +571,11 @@ test_assert_output_false(){
 		| assert_output_false test_assert_output_false_multi_line_arg_regex 'dump' 'truck' 2>&1  \
 		| test_compare_output test_assert_output_false_multi_line_arg_regex_out ; then
 	   test_failure_msg
+	fi
+	if ! :								\
+		| assert_output_false	2>&1	\
+		| test_compare_output test_assert_output_false_must_generate_something; then
+		test_failure_msg
 	fi
 }
 test_assert_output_false_multi_line_arg(){
@@ -540,6 +614,16 @@ msg='assert_output_false failed'
  +  source='./assert.source_test.sh' func='test_assert_output_false'
 BODY
 }
+test_assert_output_false_must_generate_something(){
+cat <<BODY
+msg='assert_output_false failed'
+ +  generated='nothing'
+ +  expected_='something'
+ +  lineNo=515
+ +  source='./assert.source_test.sh' func='test_assert_output_false'
+BODY
+}
+
 
 
 test_failure_msg(){
