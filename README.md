@@ -2,9 +2,11 @@
 Provide yet another assertion library for testing.  Primarily for Bash scripting but can be broadly applied to CLI programs that affect environment variables or generate output.
 ### ToC 
 [Index](#api-index)  
-[API](#api)  
+[API](#api)
 [Install](#install)  
+[Test](#test)  
 [Terms](#terms)  
+[License MIT](https://github.com/WhisperingChaos/assert.source.sh/blob/master/LICENSE)  
 
 ### API Index
 [assert_true \<bashTestEncapsulted\> ["${@}"]](#assert_true-bashtestencapsulted-)
@@ -138,12 +140,14 @@ A function whose execution sets the return code for the process.  Encode it as t
 ### Install
 Simply copy assert.source.sh into a directory then use the Bash [source](https://www.gnu.org/software/bash/manual/html_node/Bash-Builtins.html#Bash-Builtins) command to include this package in a Bash testing script before executing fuctions which rely on its [API](#api-index).  Copying can be achived by:
 
-    * [git clone](https://help.github.com/articles/cloning-a-repository/) to copy entire project contents including its git repository.  Obtains current master which may include untested features.  To synchronize the working directory to reflect the desired release, use ```git checkout tags/<tag_name>```.
-    *  wget https://github.com/whisperingchaos/assert.source.sh/tarball/master creates a tarball that includes only the project files without the git repository.  Obtains current master branch which may include untested features.
+  * [```git clone```](https://help.github.com/articles/cloning-a-repository/) to copy entire project contents including its git repository.  Obtains current master which may include untested features.  To synchronize the working directory to reflect the desired release, use ```git checkout tags/<tag_name>```.
+  *  ```wget https://github.com/whisperingchaos/assert.source.sh/tarball/master``` creates a tarball that includes only the project files without the git repository.  Obtains current master branch which may include untested features.
     
 #### Developed Using 
   * GNU Bash  4.2.25(1)-release
+  
 #### Example
+Simply 
   
 ### Terms
 #### Cocoon
