@@ -2,7 +2,7 @@
 Provide yet another assertion library for testing.  Primarily for Bash scripting but can be broadly applied to CLI programs that affect environment variables or generate output.
 ### ToC 
 [Index](#api-index)  
-[API](#api)
+[API](#api)  
 [Install](#install)  
 [Test](#test)  
 [Terms](#terms)  
