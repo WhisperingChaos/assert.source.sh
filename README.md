@@ -154,7 +154,6 @@ After [installing](#install) change directory to **assert.source.sh**'s ```test`
 ```
 host:~/Desktop/projects/assert.source.sh/test$ ./assert.source_test.sh
 host:~/Desktop/projects/assert.source.sh/test$ 
-
 ```
   
 ### Terms
