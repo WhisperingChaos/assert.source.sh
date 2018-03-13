@@ -1,7 +1,12 @@
 # assert.source.sh
 Provide yet another assertion library for testing.  Primarily for Bash scripting but can be broadly applied to CLI programs that affect environment variables or generate output.
+### ToC 
+[Index](api-index)  
+[API](#api)  
 
-### Public API
+### API Index
+
+### API
 
 #### assert_true \<bashTestEncapsulted\> ["${@}"]
 Generate message indicating failure of stated condition when **\<bashTestEncapsulated\>** evaluates to *false*.  Otherwise, be silent.
