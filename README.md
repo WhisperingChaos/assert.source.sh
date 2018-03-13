@@ -6,7 +6,7 @@ Provide yet another assertion library for testing.  Primarily for Bash scripting
 [Install](#install)
 
 ### API Index
-[assert_true \<bashTestEncapsulted\> ["${@}"]]()
+[assert_true \<bashTestEncapsulted\> ["${@}"]](#assert_true-bashtestencapsulted-)
 
 ### API
 
