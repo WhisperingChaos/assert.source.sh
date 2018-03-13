@@ -138,7 +138,7 @@ assert_true '[ "$1" == "a" ]'
 A function whose execution sets the return code for the process.  Encode it as the last command executed by the test script, especially when testing through assertions by specifying **assert_continue** mode (the package's default behavior).
 
 ### Install
-Simply copy assert.source.sh into a directory then use the Bash [source](https://www.gnu.org/software/bash/manual/html_node/Bash-Builtins.html#Bash-Builtins) command to include this package in a Bash testing script before executing fuctions which rely on its [API](#api-index).  Copying can be achived by:
+Simply copy assert.source.sh into a directory then use the Bash [source](https://www.gnu.org/software/bash/manual/html_node/Bash-Builtins.html#Bash-Builtins) command to include this package in a Bash testing script before executing fuctions which rely on its [API](#api-index).  Copying using:
 
   * [```git clone```](https://help.github.com/articles/cloning-a-repository/) to copy entire project contents including its git repository.  Obtains current master which may include untested features.  To synchronize the working directory to reflect the desired release, use ```git checkout tags/<tag_name>```.
   *  ```wget https://github.com/whisperingchaos/assert.source.sh/tarball/master``` creates a tarball that includes only the project files without the git repository.  Obtains current master branch which may include untested features.
@@ -148,6 +148,14 @@ Simply copy assert.source.sh into a directory then use the Bash [source](https:/
   
 #### Example
 Simply 
+
+### Test
+After [installing](#install) change directory to **assert.source.sh**'s ```test``` directory and run [**assert.source_test.sh**](https://github.com/WhisperingChaos/assert.source.sh/blob/master/test/assert.source_test.sh).  It should complete successfully and not produce any messages.
+```
+host:~/Desktop/projects/assert.source.sh/test$ ./assert.source_test.sh
+host:~/Desktop/projects/assert.source.sh/test$ 
+
+```
   
 ### Terms
 #### Cocoon
