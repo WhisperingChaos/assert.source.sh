@@ -41,7 +41,7 @@ assert__output_bool(){
 		# expected output is empty
 		exec {asrtFDesc}< <( : ) 
 	else
-		exec {asrtFDesc}< <( $2 "${@:3:$asrtPasOutLen}" )
+		exec {asrtFDesc}< <( $2 "${@:3:$asrtPasOutLen}" 2>&1 )
 	fi
 	local -r asrtNegate="$1"
 	local asrtIsCompareFail='true'
@@ -61,7 +61,7 @@ assert__output_bool(){
 			if ! assert__output_compare "$asrtNegate" "$asrtFDesc"	\
 				'asrtPasGenInCnt' 'asrtPasExptOutCnt'				\
 				'asrtPasGeneratedOutput' 'asrtPasExpectedOutput'	\
-			   	< <( $asrtCmmndGen "${@:$asrtPasInputPos+3}" ); then
+				< <( $asrtCmmndGen "${@:$asrtPasInputPos+3}" 2>&1); then
 				break
 			fi
 		elif ! assert__output_compare "$asrtNegate" "$asrtFDesc"	\
@@ -135,7 +135,8 @@ assert__cmd_input_find(){
 	}
 	if [ $asrtInputPos -gt 0 ]; then
 		(( asrtOutLen = asrtInputPos - 1 ))
-	elif [ $asrtOutLen -gt 0 ]; then
+	fi
+	if [ $asrtOutLen -gt 0 ]; then
 		(( asrtOutLen-- ))	
 	fi
 	eval $asrtRtnInputPos=\$asrtInputPos
