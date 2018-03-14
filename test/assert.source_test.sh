@@ -364,6 +364,9 @@ test_assert_output_true(){
 	if !  echo "hi" | assert_output_true "echo hi"; then
 		test_failure_msg
 	fi
+	if ! assert_output_true echo 'hi' --- echo 'hi'; then
+		test_failure_msg
+	fi
 	if ! assert_true 'echo "hi" | assert_output_true "echo hi"'; then
 		test_failure_msg
 	fi
