@@ -1,14 +1,15 @@
 # assert.source.sh
 Provide yet another assertion library for testing.  Primarily for Bash scripting but can be broadly applied to CLI programs that affect environment variables or generate output.
 ### ToC 
-[Index](#api-index)  
+[API Index](#api-summary)  
 [API](#api)  
 [Install](#install)  
+[Example](#example)
 [Test](#test)  
 [Terms](#terms)  
 [License MIT](https://github.com/WhisperingChaos/assert.source.sh/blob/master/LICENSE)  
 
-### API Index
+### API Summary
 [assert_true \<bashTestEncapsulted\> ["${@}"]](#assert_true-bashtestencapsulted-)
 
 [assert_false \<bashTestEncapsulted\> ["${@}"]](#assert_false-bashtestencapsulted-)
@@ -162,7 +163,7 @@ Simply copy assert.source.sh into a directory then use the Bash [source](https:/
 #### Developed Using 
   * GNU Bash  4.2.25(1)-release
   
-#### Example
+### Example
 [example.source_test.sh](https://github.com/WhisperingChaos/assert.source.sh/blob/master/test/example.source_test.sh)
 
 ### Test
