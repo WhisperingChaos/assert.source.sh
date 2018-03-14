@@ -16,6 +16,8 @@ Provide yet another assertion library for testing.  Primarily for Bash scripting
 
 [assert_output_true [\<commandExpected\>] [\<argList\>] [\<inputDelim\> \<commandGenerate\> [\<argList\>]]](https://github.com/WhisperingChaos/assert.source.sh/blob/master/README.md#assert_output_true-commandexpected-arglist-inputdelim-commandgenerate-arglist)
 
+[[\<commandGenerate\> [\<argList\>]] | assert_output_true [\<commandExpected\> [\<argList\>]]](https://github.com/WhisperingChaos/assert.source.sh/blob/master/README.md#assert_output_true-commandexpected-arglist-inputdelim-commandgenerate-arglist)
+
 [assert_output_false [\<commandExpected\>] [\<argList\>] [\<inputDelim\> \<commandGenerate\> [\<argList\>]]](https://github.com/WhisperingChaos/assert.source.sh/blob/master/README.md#assert_output_false-commandexpected-arglist-inputdelim-commandgenerate-arglist)
 
 [assert_halt](#assert_halt)
