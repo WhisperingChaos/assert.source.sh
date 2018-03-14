@@ -11,7 +11,7 @@ Provide yet another assertion library for testing.  Primarily for Bash scripting
 ### API Index
 [assert_true \<bashTestEncapsulted\> ["${@}"]](#assert_true-bashtestencapsulted-)
 
-[assert_output_true [\<commandExpected\>] [\<argList\>] [\<inputDelim\> \<commandGenerate\> [\<argList\>]]]()
+[assert_output_true [\<commandExpected\>] [\<argList\>] [\<inputDelim\> \<commandGenerate\> [\<argList\>]]](https://github.com/WhisperingChaos/assert.source.sh/blob/master/README.md#assert_output_true-commandexpected-arglist-inputdelim-commandgenerate-arglist)
 ### API
 
 #### assert_true \<bashTestEncapsulted\> ["${@}"]
