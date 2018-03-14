@@ -4,7 +4,7 @@ Provide yet another assertion library for testing.  Primarily for Bash scripting
 [API Index](#api-summary)  
 [API](#api)  
 [Install](#install)  
-[Example](#example)
+[Example](#example)  
 [Test](#test)  
 [Terms](#terms)  
 [License MIT](https://github.com/WhisperingChaos/assert.source.sh/blob/master/LICENSE)  
