@@ -12,7 +12,7 @@ test_assert(){
 	# should fail.
 	assert_false '[ "$hostName" == '\''hNmGood1'\'' ]'
 	# affirm return code for function hostNameVerify is true when compliant
-    # hostname supplied.
+	# hostname supplied.
 	# should succeed.
 	assert_true 'hostNameVerify "$hostName"'
 	# affirm no output from either STDERR or STEOUT when
