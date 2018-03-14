@@ -147,7 +147,7 @@ Simply copy assert.source.sh into a directory then use the Bash [source](https:/
   * GNU Bash  4.2.25(1)-release
   
 #### Example
-Simply 
+[example.source_test.sh](https://github.com/WhisperingChaos/assert.source.sh/blob/master/test/example.source_test.sh)
 
 ### Test
 After [installing](#install) change directory to **assert.source.sh**'s ```test``` directory and run [**assert.source_test.sh**](https://github.com/WhisperingChaos/assert.source.sh/blob/master/test/assert.source_test.sh).  It should complete successfully and not produce any messages.
