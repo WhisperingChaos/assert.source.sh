@@ -43,7 +43,7 @@ Generate message indicating failure of stated condition when **\<bashTestEncapsu
    *  **["${@}"]** forwards current argument values, $1-$N, of the function calling **assert_true**.  The position and values of these forwarded arguments are preserved within **assert_true** enabling the writting of **\<bashTestEncapsulated\>** expressions involving these arguments to reflect the presepective of the calling function.
   ```
     adminNm(){
-        assert_true '[ "$1" == 'admin' ]' "${@}"
+        assert_true '[ "$1" == '\''admin'\'' ]' "${@}"
     }
     adminNm 'admin'
   ```
