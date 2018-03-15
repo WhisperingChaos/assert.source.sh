@@ -20,13 +20,13 @@ Provide yet another assertion library for testing.  Primarily for Bash scripting
 
 [assert_{true/false} '\<commandGenerate\> [\<argList\>] | assert_output_{true/false} [\<commandExpected\> [\<argList\>]]'](https://github.com/WhisperingChaos/assert.source.sh/blob/master/README.md#assert_truefalse-commandgenerate-arglist--assert_output_truefalse-commandexpected-arglist)
 
-[assert_halt](#assert_halt)
-
-[assert_continue](#assert_continue)
-
 [assert_bool_performant](#assert_bool_performant)
 
 [assert_bool_detailed](#assert_bool_detailed)
+
+[assert_halt](#assert_halt)
+
+[assert_continue](#assert_continue)
 
 [assert_return_code_set](#assert_return_code_set)
 
@@ -120,12 +120,6 @@ Negated form of **assert_output_true**.  Requires every delimited block of bytes
 #### assert_{true/false} '\<commandGenerate\> [\<argList\>] | assert_output_{true/false} [\<commandExpected\> [\<argList\>]]'
 A piped version of **assert_output_{true/false}**.  This form is expained within the context of [**assert_output_true**](https://github.com/WhisperingChaos/assert.source.sh/blob/master/README.md#assert_output_true-commandexpected-arglist-inputdelim-commandgenerate-arglist).  
 
-#### assert_halt
-After invoking this function, the next failure detected by an assertion will cause the current process to abruptly terminate with an error code of '1'.
-
-#### assert_continue
-After invoking this function, the current process will continue execution through failures detected by subsequent assertions.  When assertion failures occur in this mode, the fact that a failure occurred is remembered.  This is the default behavior of this assertion library.  Once testing completes, the **assert_return_code_set** can be called to establish the return code value for the entire test.  
-
 #### assert_bool_performant
 Implements the evaluation of **assert_true** within the current process - doesn't spawn a child process. Therefore, an incorrectly formed **\<bashTestEncapsulted\>** will terminate the current process.  Also, an evaluation violating the constraint enforced by an assert is performed a second time in order to generate a useful message.  The code attempts to limit this second evaluation to only environment variables, as evaluating other expressions, like those used to start a subprocess, may result in undesirable side effects when executed a second time.  In general, limiting evaluation to only environment variables is usually sufficient to debug the assert failure.  However, in certain situations, a more detailed evaluation of the expression can be produced using **assert_bool_detailed**
 
@@ -155,6 +149,12 @@ assert_true '[ "$1" == "a" ]'
 .
 .
 ```
+
+#### assert_halt
+After invoking this function, the next failure detected by an assertion will cause the current process to abruptly terminate with an error code of '1'.
+
+#### assert_continue
+After invoking this function, the current process will continue execution through failures detected by subsequent assertions.  When assertion failures occur in this mode, the fact that a failure occurred is remembered.  This is the default behavior of this assertion library.  Once testing completes, the **assert_return_code_set** can be called to establish the return code value for the entire test.  
 
 #### assert_return_code_set
 A function whose execution sets the return code for the process.  Encode it as the last command executed by the test script, especially when testing through assertions by specifying **assert_continue** mode (the package's default behavior).
