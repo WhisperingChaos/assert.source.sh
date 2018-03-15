@@ -1,5 +1,6 @@
 #!/bin/bash
-
+# source commands reflect working directory location containng example.source_test.sh
+# within assert.source.sh repo.
 source base/assert.source.sh
 source example.source.sh
 
