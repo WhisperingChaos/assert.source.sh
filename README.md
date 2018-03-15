@@ -55,11 +55,10 @@ Compares the output, produced by **\<commandGenerate\>** to the output supplied 
 
 This alternate form, differs from [piping](http://www.linfo.org/pipes.html) *(|)*, as it captures both STDOUT and STDERR of **\<commandGenerate\>** function and executes **assert_output_true** within the current process.  Also it's generally simpler to encode than piping and ensures proper assertion behavior.  A more indepth explaination follows.
   * **[\<commandExpected\>]** An optional addressible Bash function or CLI command whose STDOUT and STDERR will be consumed as input by **assert_output_true**.  If omitted or fails to generate output, **\<commandGenerate\>** must also omitt output from STDOUT or STDERR to affirm the assertion. In situations when **\<commandExpected>** produces output, each output line can be selectively prefixed by *${assert_REGEX_COMPARE}* *('\<RegEx\>')* to dynamically switch between an exact or regex pattern match.  See below for details.   
-  * **[\<argList\>]** An optional list of arguments passed to  **\<commandExpected\>**
-  * **\<inputDelim\> \<commandGenerate\> [\<argList\>]]** 
-    * **\<inputDelim\>** A pattern separating the invocation and associated parameters of **\<commandExpected\>** from **\<commandGenerate\>**.  It's defined by *${assert_INPUT_CMD_DELIMITER}* *('---')*.
-    * **\<commandGenerate\>** An addressible bash function or CLI command whose STDOUT and STDERROR will be consumed unaltered by **assert_output_true** and compared to **\<commandExpected\>**.
-    * **[\<argList\>]** An optional argument list passed into **\<commandExpected\>**.
+  * **[\<argList\>]** An optional list of arguments passed to  **\<commandExpected\>**.
+  * **\<inputDelim\>** A pattern separating the invocation and associated parameters of **\<commandExpected\>** from **\<commandGenerate\>**.  It's defined by *${assert_INPUT_CMD_DELIMITER}* *('---')*.
+  * **\<commandGenerate\>** An addressible bash function or CLI command whose STDOUT and STDERROR will be consumed unaltered by **assert_output_true** and compared to **\<commandExpected\>**.
+  * **[\<argList\>]** An optional argument list passed into **\<commandExpected\>**.
     
 The comparision function uses the Bash *read* command to consume the output produced by both commands. Each *read* command transfers its data into an environment variable.  The content of the two environment variables are then compared to identify differences between the outputs produced by **\<commandGenerate\>** and **\<commandExpected\>**.  When first devised, a smallish collection of human readable newline terminated text was expected as the output supplied by **\<commandGenerate\>** and **\<commandExpected\>**.  However, *read* also consumes any data streamed via STDIN, including the contents of executable files.  Therefore, one can compare the contents of non-human readable sources as long as there's enough memory to maintain two, potentially complete, in memory replicas.  Furthermore, the comparison function offers both regular expresssion and simple equality matching.
 
