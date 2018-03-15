@@ -1,5 +1,5 @@
 # assert.source.sh
-Provide yet another assertion library for testing.  Primarily for Bash scripting but can be broadly applied to CLI programs that affect environment variables or generate output.
+Provide yet another assertion package for testing.  Primarily for Bash scripting but can be broadly applied to CLI programs that affect environment variables or generate output.
 ### ToC 
 [API Index](#api-index)  
 [API](#api)  
@@ -123,7 +123,7 @@ A piped version of **assert_output_{true/false}**.  This form is expained within
 #### assert_bool_performant
 Implements the evaluation of **assert_true** within the current process - doesn't spawn a child process. Therefore, an incorrectly formed **\<bashTestEncapsulted\>** will terminate the current process.  Also, an evaluation violating the constraint enforced by an assert is performed a second time in order to generate a useful message.  The code attempts to limit this second evaluation to only environment variables, as evaluating other expressions, like those used to start a subprocess, may result in undesirable side effects when executed a second time.  In general, limiting evaluation to only environment variables is usually sufficient to debug the assert failure.  However, in certain situations, a more detailed evaluation of the expression can be produced using **assert_bool_detailed**
 
-The assert library uses this performant form as its default implementation.
+The assert package uses this performant form as its default implementation.
 ```
 # by default, don't have to call assert_bool_performant
 assert_bool_performant
@@ -154,7 +154,7 @@ assert_true '[ "$1" == "a" ]'
 After invoking this function, the next failure detected by an assertion will cause the current process to abruptly terminate with an error code of '1'.
 
 #### assert_continue
-After invoking this function, the current process will continue execution through failures detected by subsequent assertions.  When assertion failures occur in this mode, the fact that a failure occurred is remembered.  This is the default behavior of this assertion library.  Once testing completes, the **assert_return_code_set** can be called to establish the return code value for the entire test.  
+After invoking this function, the current process will continue execution through failures detected by subsequent assertions.  When assertion failures occur in this mode, the fact that a failure occurred is remembered.  This is the default behavior of this assertion package.  Once testing completes, the **assert_return_code_set** can be called to establish the return code value for the entire test.  
 
 #### assert_return_code_set
 A function whose execution sets the return code for the process.  Encode it as the last command executed by the test script, especially when testing through assertions by specifying **assert_continue** mode (the package's default behavior).
