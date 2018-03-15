@@ -98,7 +98,6 @@ test_5_expected(){
 }
 assert_output_true test_5_expected '1' '2' --- test_5_generated '1' '2'
 ```
-Besides the method demonstrated above, a second one, more akin to the traditional piping mechanism, can be encoded.
 
 The second method combines **assert_true** with **assert_output_true** by specifying **assert_output_true** as a **\<bashTestEncapsulted\>** expression.  In this situation, **assert_true** executes within the current process, allowing it to affect source variable vaues while **assert_output_true** is spawned as the last child process in a pipe.  This ordering of **assert_output_true** feeds the STDOUT of an upstream command to its STDIN.  Since **assert_output_true** will generate both an appropriate output and return code value, **assert_true** can then apply ("forward") the source level variable update that would have happened had **assert_output_true** been performed within the context of the parent process.
 ```
