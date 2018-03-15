@@ -172,7 +172,7 @@ Simply copy assert.source.sh into a directory then use the Bash [source](https:/
 [example.source_test.sh](https://github.com/WhisperingChaos/assert.source.sh/blob/master/test/example.source_test.sh)
 
 ### Test
-After [installing](#install) change directory to **assert.source.sh**'s ```test``` directory and run [**assert.source_test.sh**](https://github.com/WhisperingChaos/assert.source.sh/blob/master/test/assert.source_test.sh).  It should complete successfully and not produce any messages.
+After [installing](#install), change directory to **assert.source.sh**'s ```test``` directory and run [**assert.source_test.sh**](https://github.com/WhisperingChaos/assert.source.sh/blob/master/test/assert.source_test.sh).  It should complete successfully and not produce any messages.
 ```
 host:~/Desktop/projects/assert.source.sh/test$ ./assert.source_test.sh
 host:~/Desktop/projects/assert.source.sh/test$ 
