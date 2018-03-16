@@ -126,7 +126,6 @@ Implements the evaluation of **assert_true** within the current process - doesn'
 The assert package uses this performant form as its default implementation.
 ```
 # by default, don't have to call assert_bool_performant
-assert_bool_performant
 assert_false '[ "$1" == "b"]'
 assert_true '[ "$1" == "a" ]'
 .
