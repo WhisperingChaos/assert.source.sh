@@ -1,3 +1,5 @@
+[![Actions Status](https://github.com/whisperingchaos/assert.source.sh/workflows/test/badge.svg)](https://github.com/WhisperingChaos/assert.source.sh/actions)
+
 # assert.source.sh
 Provide yet another assertion package for testing.  Primarily for Bash scripting but can be broadly applied to CLI programs that affect environment variables or generate output.
 ### ToC 
