@@ -164,7 +164,7 @@ called(){
 
 In situations involving assertions reliant on side effects, like the one demonstrated by example above, either always call **assert_bool_performant** before executing the asserted code or execute the code independent of an **assert_{true|false}** then apply the assert to test the side affect.
 
-Typically, its more resource efficient and speedier to use the implementation of **assert_bool_performant**.  However, since either implementation can dynamically replace the other, it might be advisable to use **assert_bool_detailed** when first developing a test script, due to its reliability and detailed evaluation output, then once the test script becomes stable, simply replace it with **assert_bool_performant**.
+Typically, its more resource efficient and speedier to use the implementation of **assert_bool_performant**.  However, since either implementation can dynamically replace the other, except in the situation mentioned above, it might be advisable to use **assert_bool_detailed** when first developing a test script, due to its reliability and detailed evaluation output, then once the test script becomes stable, simply replace it with **assert_bool_performant**.
 ```
 # using detailed implementation of assert_true
 assert_bool_detailed
