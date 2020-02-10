@@ -32,7 +32,7 @@ Provide yet another assertion package for testing.  Primarily for Bash scripting
 
 [assert_return_code_set](#assert_return_code_set)
 
-[assert_return_code_child_failure_relay [\<childCommand\> [\<argList\>]]](./blob/master/README.md#assert_return_code_child_failure_relay-childcommand-arglist)
+[assert_return_code_child_failure_relay [\<childCommand\> [\<argList\>]]](README.md#assert_return_code_child_failure_relay-childcommand-arglist)
 
 ### API
 
