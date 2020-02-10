@@ -49,8 +49,28 @@ test_assert(){
 
 }
 
+test_assert_child_process(){
+	assert_return_code_child_failure_relay 'test_assert_child_process_run'
+}
+
+test_assert_child_process_run()(
+	# initiate function as child process.  Notice function body defined within "()" instead of "{}".
+	# Bash (Linux) starts child process with nearly exact state of parent.  Linux uses Copy On Write
+	# (https://en.wikipedia.org/wiki/Copy-on-write) mechanism to shield parent process from memory updates
+	# performed by the child.  Therefore, assert_ invocations in this child process fail to affect the state
+	# of the assert_ package active in the parent.
+
+	# raise an assertion.
+	assert_true false
+	# communicate failure to parent process by setting the return code according to the assert package instance
+	# running within this child.
+	assert_return_code_set	
+)
+
+
 main(){
 	test_assert
+	test_assert_child_process
 	assert_return_code_set	
 }
 main

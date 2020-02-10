@@ -322,4 +322,23 @@ assert__halt_check(){
 assert_return_code_set(){
 	! $assert__RAISED_SOMETIME_DURING_EXECUTION
 }
+assert_return_code_child_failure_relay(){
+	local asrtErrorCodeChild=$?
+
+	while true; do
+		if [ -z "$1" ]; then
+			local -r asrtErrorCodeChild
+			break
+		fi
+		$@
+		local -r asrtErrorCodeChild=$?
+		break
+	done
+
+	if [ $asrtErrorCodeChild -ne 0 ]; then
+		assert__raised_record
+		assert__halt_check
+	fi
+}
+
 assert_source_init

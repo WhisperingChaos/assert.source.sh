@@ -647,11 +647,56 @@ test_compare_output_tee(){
 	return $rtncd
 }
 
+
+
+test_assert_child_process(){
+	# set parent (this process) assert_ package state to no failures
+	# so child process copy of assert_ package also initially reports no
+	# failures
+	assert__RAISED_SOMETIME_DURING_EXECUTION='false'
+	# run child process and assert 
+	if ! assert_false test_assert_child_process_run; then
+		test_failure_msg
+	fi
+	# expect no assertions raised yet because of false check above
+	if ! assert_false $assert__RAISED_SOMETIME_DURING_EXECUTION; then 
+		test_failure_msg
+	fi
+	assert_return_code_child_failure_relay test_assert_child_process_run
+	# assertions raised in child should be communicated to this (parent) process
+	if ! assert_true	$assert__RAISED_SOMETIME_DURING_EXECUTION; then
+		test_failure_msg
+	fi
+}
+
+test_assert_child_process_run()(
+	# initiate function as child process.  Notice function body defined within "()" instead of "{}".
+	# Bash (Linux) starts child process with nearly exact state of parent.  Linux uses Copy On Write
+	# (https://en.wikipedia.org/wiki/Copy-on-write) mechanism to shield parent process from memory updates
+	# performed by the child.  Therefore, assert_ invocations in this child process fail to affect the state
+	# of the assert_ package active in the parent.
+
+	# assert no failures yet
+	if ! assert_false $assert__RAISED_SOMETIME_DURING_EXECUTION; then 
+		test_failure_msg
+	fi
+	# raise an assertion.
+	if assert_true false 2>/dev/null; then
+		test_failure_msg
+	fi
+	# communicate failure to parent process by setting the return code according to the assert package instance
+	# running in this child.
+	assert_return_code_set	
+)
+
+
+
 main(){
 	test_assert_true
 	test_assert_false
 	test_assert_output_true
 	test_assert_output_false
+	test_assert_child_process 
 	# Change assert evaluator to generate detailed evaluation messages for assert failures
 	assert_bool_detailed
 	test_assert_true_detailed

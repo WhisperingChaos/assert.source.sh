@@ -32,6 +32,8 @@ Provide yet another assertion package for testing.  Primarily for Bash scripting
 
 [assert_return_code_set](#assert_return_code_set)
 
+[assert_return_code_child_failure_relay [\<childCommand\> [\<argList\>]]](./blob/master/README.md#assert_return_code_child_failure_relay-childcommand-arglist)
+
 ### API
 
 #### assert_true \<bashTestEncapsulted\> ["${@}"]
@@ -134,7 +136,33 @@ assert_true '[ "$1" == "a" ]'
 .
 ```
 #### assert_bool_detailed
-Implements the evaluation of **assert_true** within a subprocess of the current one.  It uses *set -x* and captures its output providing a detailed trace of the entire **\<bashTestEncapsulted\>** expression.  Capturing is performed as the expression is evaluated, therefore, a second evaluation, to generate a message when the assert fails isn't required, as is the case when using **assert_bool_performant**.  Due to subprocess spawning, **assert_bool_detailed** is resilient to problematic expressions that would cause the performant implementation to abnormally terminate its current process.  However, it does fork a subshell which "costs" some amount of time and resources.
+Implements the evaluation of **assert_{true|false}** within a subprocess of the current one.  It uses *set -x* and captures its output providing a detailed trace of the entire **\<bashTestEncapsulted\>** expression.  Capturing is performed as the expression is evaluated, therefore, a second evaluation, to generate a message when the assert fails isn't required, as is the case when using **assert_bool_performant**.  Due to subprocess spawning, **assert_bool_detailed** is resilient to problematic expressions that would cause the performant implementation to abnormally terminate its current process.  However, it does fork a subshell which "costs" some amount of time and resources.  Furthermore, subprocess spawing initiated by **assert_bool_detailed** prevents it from replacing **assert_bool_performant** in situations where the tested code relies on intentional side effects.
+
+For example, a Bash function can accept a variable name as argument.  Then within the function, the passed variable can be assigned a different value.  This value is now available to the calling function via the shared variable name.  Moreover, it isn't necessary to pass a variable name as an argument.  The called code can simply update any writeable environment variable declared within the context of the calling function. However, in either situation, an intentional write operation can be thwarted when the called function executes within a child process spawned by the calling function.  A calling function that spawns (forks) a child process protects its memory from a called function's (child process') write operations due to fork's [COW mechanism](https://en.wikipedia.org/wiki/Copy-on-write).  Since **assert_bool_detailed** alters the implementaton of **assert_{true|false}** to fork a child process, an **assert_{true|false}** executing code, like a Bash function, written to rely on an intentional side affect, will fail because the called code cannot communicate the intentional side affect across the process boundry established by **assert_bool_detailed**.
+```
+	.	
+	.
+	local sharedVar=5
+	assert_bool_detailed
+	assert_true called 'sharedVar'
+	# this assert will fail due to the fork performed within assert_true's
+	# implement defined by assert_bool_detailed.  sharedVar's value remains 5.
+	assert_true '[ $sharedVar == 6 ]'
+	assert_bool_performant
+	assert_true called 'sharedVar'
+	# this assert will succeed as assert_true's implementation, defined by
+	# assert_bool_performant, executes 'called' within the same process as this
+	# calling function.
+	assert_true '[ $sharedVar == 6 ]'
+	.
+	.
+called(){
+	eval $1\=\6
+}
+
+```
+
+In situations involving assertions reliant on side effects, like the one demonstrated by example above, either always call **assert_bool_performant** before executing the asserted code or execute the code independent of an **assert_{true|false}** then apply the assert to test the side affect.
 
 Typically, its more resource efficient and speedier to use the implementation of **assert_bool_performant**.  However, since either implementation can dynamically replace the other, it might be advisable to use **assert_bool_detailed** when first developing a test script, due to its reliability and detailed evaluation output, then once the test script becomes stable, simply replace it with **assert_bool_performant**.
 ```
@@ -159,6 +187,32 @@ After invoking this function, the current process will continue execution throug
 
 #### assert_return_code_set
 A function whose execution sets the return code for the process.  Encode it as the last command executed by the test script, especially when testing through assertions by specifying **assert_continue** mode (the package's default behavior).
+
+#### [assert_return_code_child_failure_relay [\<childCommand\> [\<argList\>]]]
+Relays a failure ```[ $? -ne 0 ]```, communicated by a child command's return code, to its parent command.  Although other assert functions above can fullfill a similar role, it might be undesirable to issue another assert message (noise) if the child process already generates an appropriate assert message.  Furthermore, if desired, the childCommand can execute immediately above this function instead of specifying the childCommand as a set of arguments to it.
+
+```
+...
+
+	assert_return_code_child_failure_relay 'test_assert_child_process_run'
+
+...
+
+test_assert_child_process_run()(
+	# initiate function as child process.  Notice use of "()" instead of "{}" used to define function body.
+	# Bash (Linux) starts child process with nearly exact state of parent.  Linux uses Copy On Write
+	# (https://en.wikipedia.org/wiki/Copy-on-write) mechanism to shield parent process from memory updates
+	# performed by the child.  Therefore, assert_ invocations in this child process fail to affect the state
+	# of the assert_ package active in the parent.
+
+	# raise an assertion.
+	assert_true false
+	# communicate failure to parent process by setting the return code according to the assert package instance
+	# running within this child.
+	assert_return_code_set	
+)
+```
+
 
 ### Install
 Simply copy **assert.source.sh** into a directory then use the Bash [source](https://www.gnu.org/software/bash/manual/html_node/Bash-Builtins.html#Bash-Builtins) command to include this package in a Bash testing script before executing fuctions which rely on its [API](#api-index).  Copying using:
