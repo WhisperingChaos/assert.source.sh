@@ -188,7 +188,7 @@ After invoking this function, the current process will continue execution throug
 #### assert_return_code_set
 A function whose execution sets the return code for the process.  Encode it as the last command executed by the test script, especially when testing through assertions by specifying **assert_continue** mode (the package's default behavior).
 
-#### [assert_return_code_child_failure_relay [\<childCommand\> [\<argList\>]]]
+#### assert_return_code_child_failure_relay [\<childCommand\> [\<argList\>]]
 Relays a failure ```[ $? -ne 0 ]```, communicated by a child command's return code, to its parent command.  Although other assert functions above can fullfill a similar role, it might be undesirable to issue another assert message (noise) if the child process already generates an appropriate assert message.  Furthermore, if desired, the childCommand can execute immediately above this function instead of specifying the childCommand as a set of arguments to it.
 
 ```
